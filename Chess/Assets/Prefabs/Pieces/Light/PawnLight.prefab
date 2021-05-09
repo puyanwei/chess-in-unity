@@ -156,6 +156,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cfa0c19057f21e4f832492b9e9ae462, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hoverColor: {r: 0.9811321, g: 0.64383876, b: 0.1527234, a: 0}
+  squareHoverColor: {r: 0.07694017, g: 0.8584906, b: 0.8504237, a: 0}
+  pieceHoverColor: {r: 0.7978417, g: 0.8301887, b: 0.090067655, a: 0}
+  nearSquare: {r: 0.5, g: 0.040094346, b: 0.040094346, a: 0}
   piece: {fileID: 296864922360553300}
   chessSquare: {fileID: 7994451427936772267, guid: fd22b88497a2c204e80805a64c6c8408, type: 3}
+  chessSquares: []
+  chessSquaresDistance: []
