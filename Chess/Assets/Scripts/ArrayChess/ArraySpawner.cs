@@ -35,10 +35,7 @@ public class ArraySpawner : MonoBehaviour
         {
             SquareSpawner();
         }
-        else
-        {
-            print("Finished building");
-        }
+
 
     }
 
