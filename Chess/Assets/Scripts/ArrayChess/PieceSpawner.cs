@@ -33,13 +33,13 @@ public class PieceSpawner : MonoBehaviour
             
             PieceSpawnController();
             pieceIndex++;
-            Debug.Log("SpawnScriptCalled");
+            //Debug.Log("SpawnScriptCalled");
             
         }
         else
         {
             return;
-            Debug.Log("FinishedSpawning");
+          //  Debug.Log("FinishedSpawning");
         }
         
       
@@ -57,7 +57,7 @@ public class PieceSpawner : MonoBehaviour
             
             spawnPoint = GameObject.Find(squareNameforPawns).transform.position;
             spawnPiece(string.Join(",", "Pawn", xIndex + 1, yIndex + 1)); // spawns pawn and names it a logical name using +1 on x/y. Starting block is 1,1.
-            Debug.Log(squareNameforPawns);
+         //   Debug.Log(squareNameforPawns);
             xIndex++;
 
 
@@ -72,7 +72,7 @@ public class PieceSpawner : MonoBehaviour
 
             spawnPoint = GameObject.Find(squareNameforSpecials).transform.position;
             spawnPiece(string.Join(",", "Rook", xIndex + 1, yIndex + 1));
-            Debug.Log(string.Join(" ", squareNameforSpecials, "rooks"));            
+          //  Debug.Log(string.Join(" ", squareNameforSpecials, "rooks"));            
 
         }
         else

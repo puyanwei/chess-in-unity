@@ -8,6 +8,7 @@ public class PieceMover : MonoBehaviour
     private Renderer rend;
     private Color startColor;
     private bool isHover = false;
+    private bool boardArrayLoaded = false;
     public GameObject piece;
     public GameObject chessSquare;
     private GameObject nearestSquare;
@@ -15,9 +16,7 @@ public class PieceMover : MonoBehaviour
     public Vector3[] chessSquaresDistance;
 
 
-
-    // This is a test commit.
-
+       
 
 
     void Start()
@@ -30,11 +29,22 @@ public class PieceMover : MonoBehaviour
 
     void Update()
     {
-        if (isHover == true)
+        if (isHover == true && boardArrayLoaded == false)
         {
+            Debug.Log("Finding All Squares");
             findAllSquares();
+            boardArrayLoaded = true;
         }
 
+        if (isHover == true && boardArrayLoaded == true)
+        {
+            foreach (GameObject chessSquare in chessSquares)
+            {
+                Debug.DrawLine(chessSquare.transform.position, piece.transform.position, Color.red, 0f, false);
+            }
+                
+        }
+        
 
 
     }
@@ -44,15 +54,8 @@ public class PieceMover : MonoBehaviour
         
         chessSquares = GameObject.FindGameObjectsWithTag("square");
 
-
-
-        foreach (GameObject chessSquare in chessSquares)
-        {
-            Debug.Log(chessSquare.transform.position - piece.transform.position);
-
-            Debug.DrawLine(chessSquare.transform.position, piece.transform.position, Color.red, 0f, false);
-          
-        }
+        Debug.Log("Found All Squares");
+        boardArrayLoaded = true;
     }
 
 
