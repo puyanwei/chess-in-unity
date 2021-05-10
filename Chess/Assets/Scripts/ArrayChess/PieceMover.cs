@@ -16,12 +16,15 @@ public class PieceMover : MonoBehaviour
     private bool isHover = false;
     private bool boardArrayLoaded = false;
     private bool squareRendLoaded = false;
+
     public GameObject piece;
     public GameObject chessSquare;
     public GameObject nearestSquare;
     public GameObject[] chessSquares;
     public GameObject[] pieces;
+
     public Vector3[] chessSquaresDistance;
+
     private float oldDistance = 1f;
     private float loadtimer = 1f;
 
@@ -39,6 +42,8 @@ public class PieceMover : MonoBehaviour
                 nearestSquare = _targetSquare;
                 oldDistance = dist;
                 squareRend = nearestSquare.GetComponent<Renderer>() as Renderer;
+
+
                 squareStartColor = squareRend.material.color;
                 squareRendLoaded = true;
             }
@@ -60,7 +65,7 @@ public class PieceMover : MonoBehaviour
     {
 
 
-        getSquareRenderers();
+        getSquareRenderers(); // add a if to load only once.
 
 
         if (isHover == true && boardArrayLoaded == true)
