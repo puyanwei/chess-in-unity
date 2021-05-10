@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class PieceMover : MonoBehaviour
@@ -7,11 +8,14 @@ public class PieceMover : MonoBehaviour
     public Color squareHoverColor;
     public Color squareStartColor;
     public Color pieceHoverColor;
-    private Color pieceStartColor;
-    public Color nearSquare;
+    public Color pieceStartColor;
+    public Color moveHoverColor;
+    public Color moveStartColor;
+
 
     private Renderer rend;
-    public Renderer squareRend;
+    private Renderer pieceSquareRend;
+    private Renderer moveSquareRend;
 
     private bool isHover = false;
     private bool boardArrayLoaded = false;
@@ -22,8 +26,15 @@ public class PieceMover : MonoBehaviour
     public GameObject nearestSquare;
     public GameObject[] chessSquares;
     public GameObject[] pieces;
+    public GameObject moveSquare;
 
-    public Vector3[] chessSquaresDistance;
+    private string[] moveSquareName;
+    public string nearestSquareParent;
+
+    public int[] moveSquareCoords;
+    public int allowedMovement;
+
+    private Vector3[] chessSquaresDistance;
 
     private float oldDistance = 1f;
     private float loadtimer = 1f;
@@ -40,18 +51,41 @@ public class PieceMover : MonoBehaviour
             if (dist < oldDistance)
             {
                 nearestSquare = _targetSquare;
+                nearestSquareParent = _targetSquare.gameObject.transform.parent.name;
                 oldDistance = dist;
-                squareRend = nearestSquare.GetComponent<Renderer>() as Renderer;
-
-
-                squareStartColor = squareRend.material.color;
+                pieceSquareRend = nearestSquare.GetComponent<Renderer>() as Renderer;
+                squareStartColor = pieceSquareRend.material.color;
                 squareRendLoaded = true;
+
+                moveableSquares();
+
+
+
+
+
             }
 
 
         }
 
     }
+
+
+    void moveableSquares()
+    {
+        if(this.gameObject.tag == "pawn")
+        {
+            allowedMovement = 2;
+            moveSquareName = nearestSquareParent.Split(char.Parse(","));
+            moveSquareCoords = Array.ConvertAll(moveSquareName, s => int.Parse(s));
+            moveSquareCoords[1] += allowedMovement;
+            //moveSquare = GameObject.Find(string.Join(",", moveSquareCoords[0], moveSquareCoords[1]));
+            //moveSquareRend = moveSquare.GetComponent<Renderer>() as Renderer;
+            //moveStartColor = moveSquareRend.material.color;
+        }
+    }
+
+
 
 
     void Start()
@@ -65,13 +99,14 @@ public class PieceMover : MonoBehaviour
     {
 
 
-        getSquareRenderers(); // add a if to load only once.
+        getSquareRenderers(); // add a if to load only once per turn.
 
 
         if (isHover == true && boardArrayLoaded == true)
         {
 
-            squareRend.material.color = squareHoverColor;
+            pieceSquareRend.material.color = squareHoverColor;
+           // moveSquareRend.material.color = moveHoverColor;
 
         }
 
@@ -79,7 +114,8 @@ public class PieceMover : MonoBehaviour
         if (isHover == false && boardArrayLoaded == true && squareRendLoaded == true)
         {
 
-            squareRend.material.color = squareStartColor;
+            pieceSquareRend.material.color = squareStartColor;
+          //  moveSquareRend.material.color = moveStartColor;
 
         }
 

@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: 7599951022809646945}
   m_Layer: 0
   m_Name: PawnPiece
-  m_TagString: Untagged
+  m_TagString: pawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -157,6 +157,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   squareHoverColor: {r: 0.07694017, g: 0.8584906, b: 0.8504237, a: 0}
+  squareStartColor: {r: 0, g: 0, b: 0, a: 0}
   pieceHoverColor: {r: 0.7978417, g: 0.8301887, b: 0.090067655, a: 0}
   nearSquare: {r: 0.5, g: 0.040094346, b: 0.040094346, a: 0}
   squareRend: {fileID: 0}
@@ -164,4 +165,7 @@ MonoBehaviour:
   chessSquare: {fileID: 7994451427936772267, guid: fd22b88497a2c204e80805a64c6c8408, type: 3}
   nearestSquare: {fileID: 0}
   chessSquares: []
+  pieces: []
+  moveSquare: {fileID: 0}
+  nearestSquareParent: 
   chessSquaresDistance: []
