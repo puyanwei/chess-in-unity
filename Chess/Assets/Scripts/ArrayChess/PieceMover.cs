@@ -26,6 +26,7 @@ public class PieceMover : MonoBehaviour
     private bool isBoardArrayLoaded = false;
     private bool isSquareRendLoaded = false;
     private bool isColourUpdated = false;
+    private bool isShowingMovement = false;
 
     public GameObject testCameraBody;
     public GameObject piece;
@@ -51,7 +52,7 @@ public class PieceMover : MonoBehaviour
     {
         rend = GetComponent<Renderer>();
         pieceStartColor = rend.material.color;
-        
+
     }
 
 
@@ -62,21 +63,10 @@ public class PieceMover : MonoBehaviour
         getSquareRenderers(); // add a if to load only once per turn.
 
 
-        //if (isHover && isBoardArrayLoaded)  // Update colour of piece and pieceSquare when both the board is loaded and the mouse is hovering over piece.
-        //{
-
-        //    pieceSquareRend.material.color = squareHoverColor;
-        //    moveSquareRend.material.color = moveHoverColor;
-        //    isColourUpdated = true;
-
-        //}
-
-
         if (!isHover && isBoardArrayLoaded && isSquareRendLoaded && isColourUpdated) // Reset colour of piece and pieceSquare.
         {
 
-            pieceSquareRend.material.color = squareStartColor;
-            moveSquareRend.material.color = moveStartColor;
+            resetColors(false);
             isColourUpdated = false;
 
         }
@@ -88,29 +78,37 @@ public class PieceMover : MonoBehaviour
             isBoardArrayLoaded = true;
         }
 
-        if (Input.GetMouseButton(0))  // Clicking piece locks colour of movesquare until another piece is clicked.
+        if (Input.GetMouseButton(0)) // Clicking piece locks colour of movesquare until another piece is clicked.
         {
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             Physics.Raycast(ray, out hit);
             rayHitString = hit.transform.parent.name;
-            //rayHitGameObject = GameObject.Find(rayHitString);
 
-            if (rayHitString == piece.transform.name)
+            if (isShowingMovement && isSquareRendLoaded)
             {
-                pieceSquareRend.material.color = squareHoverColor;
-                moveSquareRend.material.color = moveHoverColor;
+
+                resetColors(false);
+                isShowingMovement = false;
             }
 
-            Debug.Log(rayHitString);            
-            Debug.DrawLine( testCameraBody.transform.position, hit.transform.position, Color.red, 0f, false);
-                
-            
+            if (!isShowingMovement && isSquareRendLoaded && rayHitString == piece.transform.name)
+            {
+
+                pieceSquareRend.material.color = squareHoverColor;
+                moveSquareRend.material.color = moveHoverColor;
+                isShowingMovement = true;
+            }
         }
-          
-
-        
-
     }
+
+    void resetColors(bool updateColor)
+    {
+        pieceSquareRend.material.color = squareStartColor;
+        moveSquareRend.material.color = moveStartColor;
+        isColourUpdated = updateColor;
+    }
+
+
 
     void getSquareRenderers() // Populates each pieces nearest square with the renderer component. Useful for landmarking or reference available positions.
     {
@@ -130,8 +128,6 @@ public class PieceMover : MonoBehaviour
                 isSquareRendLoaded = true;
 
             }
-
-
         }
 
     }
@@ -139,21 +135,21 @@ public class PieceMover : MonoBehaviour
 
     void moveableSquares()
     {
-        if(this.gameObject.tag == "pawn")
+        if (this.gameObject.tag == "pawn")
         {
-            allowedMovement = 1;
+            allowedMovement = 2;
             moveSquareName = nearestSquareParent.Split(char.Parse(","));
             moveSquareCoords = Array.ConvertAll(moveSquareName, s => int.Parse(s));
-            moveSquareCoords[1] += allowedMovement;
+            moveSquareCoords[1] += allowedMovement;            
             moveSquareParent = GameObject.Find(string.Join(",", moveSquareCoords[0], moveSquareCoords[1]));
             moveSquare = moveSquareParent.transform.GetChild(0).gameObject;
             moveSquareRend = moveSquare.GetComponent<Renderer>() as Renderer;
             moveStartColor = moveSquareRend.material.color;
-            
+
         }
         if (this.gameObject.tag == "rook")
         {
-            
+
 
         }
         if (this.gameObject.tag == "knight")
@@ -188,11 +184,11 @@ public class PieceMover : MonoBehaviour
     void OnMouseOver()
     {
         rend.material.color = pieceHoverColor;
-        isHover = true;       
+        isHover = true;
 
 
     }
-      
+
 
     void OnMouseExit()
     {
