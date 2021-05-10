@@ -26,6 +26,7 @@ public class PieceMover : MonoBehaviour
     public GameObject nearestSquare;
     public GameObject[] chessSquares;
     public GameObject[] pieces;
+    public GameObject moveSquareParent;
     public GameObject moveSquare;
 
     private string[] moveSquareName;
@@ -55,11 +56,10 @@ public class PieceMover : MonoBehaviour
                 oldDistance = dist;
                 pieceSquareRend = nearestSquare.GetComponent<Renderer>() as Renderer;
                 squareStartColor = pieceSquareRend.material.color;
+                moveableSquares();
                 squareRendLoaded = true;
 
-                moveableSquares();
-
-
+                
 
 
 
@@ -75,14 +75,32 @@ public class PieceMover : MonoBehaviour
     {
         if(this.gameObject.tag == "pawn")
         {
-            allowedMovement = 2;
+            allowedMovement = 1;
             moveSquareName = nearestSquareParent.Split(char.Parse(","));
             moveSquareCoords = Array.ConvertAll(moveSquareName, s => int.Parse(s));
             moveSquareCoords[1] += allowedMovement;
-            //moveSquare = GameObject.Find(string.Join(",", moveSquareCoords[0], moveSquareCoords[1]));
-            //moveSquareRend = moveSquare.GetComponent<Renderer>() as Renderer;
-            //moveStartColor = moveSquareRend.material.color;
+            moveSquareParent = GameObject.Find(string.Join(",", moveSquareCoords[0], moveSquareCoords[1]));
+            moveSquare = moveSquareParent.transform.GetChild(0).gameObject;
+            moveSquareRend = moveSquare.GetComponent<Renderer>() as Renderer;
+            moveStartColor = moveSquareRend.material.color;
+            
         }
+        if (this.gameObject.tag == "rook")
+        {
+            
+
+        }
+        if (this.gameObject.tag == "knight")
+        {
+
+
+        }
+        if (this.gameObject.tag == "queen")
+        {
+
+
+        }
+
     }
 
 
@@ -106,7 +124,9 @@ public class PieceMover : MonoBehaviour
         {
 
             pieceSquareRend.material.color = squareHoverColor;
-           // moveSquareRend.material.color = moveHoverColor;
+            moveSquareRend.material.color = moveHoverColor;
+
+            // moveSquareRend.material.color = moveHoverColor;
 
         }
 
@@ -115,7 +135,9 @@ public class PieceMover : MonoBehaviour
         {
 
             pieceSquareRend.material.color = squareStartColor;
-          //  moveSquareRend.material.color = moveStartColor;
+            moveSquareRend.material.color = moveStartColor;
+
+            //  moveSquareRend.material.color = moveStartColor;
 
         }
 

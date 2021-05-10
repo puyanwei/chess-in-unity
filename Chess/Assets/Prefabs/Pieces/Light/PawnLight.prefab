@@ -159,13 +159,16 @@ MonoBehaviour:
   squareHoverColor: {r: 0.07694017, g: 0.8584906, b: 0.8504237, a: 0}
   squareStartColor: {r: 0, g: 0, b: 0, a: 0}
   pieceHoverColor: {r: 0.7978417, g: 0.8301887, b: 0.090067655, a: 0}
-  nearSquare: {r: 0.5, g: 0.040094346, b: 0.040094346, a: 0}
-  squareRend: {fileID: 0}
+  pieceStartColor: {r: 0, g: 0, b: 0, a: 0}
+  moveHoverColor: {r: 0.078431375, g: 0.85882354, b: 0.8509804, a: 0}
+  moveStartColor: {r: 0, g: 0, b: 0, a: 0}
   piece: {fileID: 296864922360553300}
   chessSquare: {fileID: 7994451427936772267, guid: fd22b88497a2c204e80805a64c6c8408, type: 3}
   nearestSquare: {fileID: 0}
   chessSquares: []
   pieces: []
+  moveSquareParent: {fileID: 0}
   moveSquare: {fileID: 0}
   nearestSquareParent: 
-  chessSquaresDistance: []
+  moveSquareCoords: 
+  allowedMovement: 0
