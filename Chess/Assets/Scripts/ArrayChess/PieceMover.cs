@@ -5,7 +5,7 @@ using UnityEngine;
 public class PieceMover : MonoBehaviour
 {
     public Color squareHoverColor;
-    private Color squareStartColor;
+    public Color squareStartColor;
     public Color pieceHoverColor;
     private Color pieceStartColor;
     public Color nearSquare;
@@ -15,37 +15,39 @@ public class PieceMover : MonoBehaviour
 
     private bool isHover = false;
     private bool boardArrayLoaded = false;
+    private bool squareRendLoaded = false;
     public GameObject piece;
     public GameObject chessSquare;
     public GameObject nearestSquare;
     public GameObject[] chessSquares;
+    public GameObject[] pieces;
     public Vector3[] chessSquaresDistance;
-    private float oldDistance = 9999;
+    private float oldDistance = 1f;
+    private float loadtimer = 1f;
 
 
 
     void getSquareRenderers() // Populates each pieces nearest square with the renderer component. Useful for landmarking or reference available positions.
     {
-        foreach (GameObject targetSquare in chessSquares)
+
+        foreach (GameObject _targetSquare in chessSquares)
         {
 
-            float dist = Vector3.Distance(this.gameObject.transform.position, targetSquare.transform.position);
+            float dist = Vector3.Distance(piece.gameObject.transform.position, _targetSquare.transform.position);
             if (dist < oldDistance)
             {
-                nearestSquare = targetSquare;
+                nearestSquare = _targetSquare;
                 oldDistance = dist;
+                squareRend = nearestSquare.GetComponent<Renderer>() as Renderer;
+                squareStartColor = squareRend.material.color;
+                squareRendLoaded = true;
             }
-            squareRend = nearestSquare.GetComponent("Renderer") as Renderer;
 
-            //if (isHover == true && boardArrayLoaded == true) // this doesn't work as intended.
-            //{
-            //    Debug.DrawLine(targetSquare.transform.position, piece.transform.position, Color.red, 0f, false);
-            //    squareStartColor = squareRend.material.color;
-            //    squareRend.material.color = squareHoverColor;
-            //}
-            
+
         }
+
     }
+
 
     void Start()
     {
@@ -53,15 +55,35 @@ public class PieceMover : MonoBehaviour
         pieceStartColor = rend.material.color;
     }
 
+
     void Update()
     {
+
+
         getSquareRenderers();
 
-        if (isHover == true && boardArrayLoaded == false)
+
+        if (isHover == true && boardArrayLoaded == true)
+        {
+
+            squareRend.material.color = squareHoverColor;
+
+        }
+
+
+        if (isHover == false && boardArrayLoaded == true && squareRendLoaded == true)
+        {
+
+            squareRend.material.color = squareStartColor;
+
+        }
+
+        if (boardArrayLoaded == false)
         {
 
             findAllSquares();
             boardArrayLoaded = true;
+            Debug.Log(chessSquares.Length + " squares loaded");
         }
 
 
@@ -69,9 +91,17 @@ public class PieceMover : MonoBehaviour
 
     void findAllSquares()
     {
+        if (loadtimer > 0f)
+        {
+
+            loadtimer -= Time.deltaTime;
+            findAllSquares();
+        }
 
         chessSquares = GameObject.FindGameObjectsWithTag("square");
+
         boardArrayLoaded = true;
+
     }
 
 
@@ -79,6 +109,7 @@ public class PieceMover : MonoBehaviour
     {
         rend.material.color = pieceHoverColor;
         isHover = true;
+
 
     }
 
@@ -89,4 +120,5 @@ public class PieceMover : MonoBehaviour
 
     }
 }
+
 
