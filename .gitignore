@@ -21,6 +21,7 @@ Chess/[Mm]emoryCaptures/
 
 # Visual Studio cache directory
 Chess/.vs/
+Chess/.vsconfig/
 
 # Gradle cache directory
 Chess/.gradle/

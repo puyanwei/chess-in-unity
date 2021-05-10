@@ -18,8 +18,9 @@ public class PieceMover : MonoBehaviour
     private Renderer moveSquareRend;
 
     private bool isHover = false;
-    private bool boardArrayLoaded = false;
-    private bool squareRendLoaded = false;
+    private bool isBoardArrayLoaded = false;
+    private bool isSquareRendLoaded = false;
+    private bool isColourUpdated = false;
 
     public GameObject piece;
     public GameObject chessSquare;
@@ -37,10 +38,54 @@ public class PieceMover : MonoBehaviour
 
     private Vector3[] chessSquaresDistance;
 
-    private float oldDistance = 1f;
+    private float targetDistance = 1f;
     private float loadtimer = 1f;
 
+    void Start()
+    {
+        rend = GetComponent<Renderer>();
+        pieceStartColor = rend.material.color;
+    }
 
+
+    void Update()
+    {
+
+
+        getSquareRenderers(); // add a if to load only once per turn.
+
+
+        if (isHover && isBoardArrayLoaded) 
+        {
+
+            pieceSquareRend.material.color = squareHoverColor;
+            moveSquareRend.material.color = moveHoverColor;
+            isColourUpdated = true;
+            // moveSquareRend.material.color = moveHoverColor;
+
+        }
+
+
+        if (!isHover && isBoardArrayLoaded && isSquareRendLoaded && isColourUpdated) 
+        {
+
+            pieceSquareRend.material.color = squareStartColor;
+            moveSquareRend.material.color = moveStartColor;
+            isColourUpdated = false;
+            //  moveSquareRend.material.color = moveStartColor;
+
+        }
+
+        if (!isBoardArrayLoaded)
+        {
+
+            findAllSquares();
+            isBoardArrayLoaded = true;
+            Debug.Log(chessSquares.Length + " squares loaded");
+        }
+
+
+    }
 
     void getSquareRenderers() // Populates each pieces nearest square with the renderer component. Useful for landmarking or reference available positions.
     {
@@ -49,19 +94,15 @@ public class PieceMover : MonoBehaviour
         {
 
             float dist = Vector3.Distance(piece.gameObject.transform.position, _targetSquare.transform.position);
-            if (dist < oldDistance)
+            if (dist < targetDistance)
             {
                 nearestSquare = _targetSquare;
                 nearestSquareParent = _targetSquare.gameObject.transform.parent.name;
-                oldDistance = dist;
+                targetDistance = dist;
                 pieceSquareRend = nearestSquare.GetComponent<Renderer>() as Renderer;
                 squareStartColor = pieceSquareRend.material.color;
                 moveableSquares();
-                squareRendLoaded = true;
-
-                
-
-
+                isSquareRendLoaded = true;
 
             }
 
@@ -103,55 +144,6 @@ public class PieceMover : MonoBehaviour
 
     }
 
-
-
-
-    void Start()
-    {
-        rend = GetComponent<Renderer>();
-        pieceStartColor = rend.material.color;
-    }
-
-
-    void Update()
-    {
-
-
-        getSquareRenderers(); // add a if to load only once per turn.
-
-
-        if (isHover == true && boardArrayLoaded == true)
-        {
-
-            pieceSquareRend.material.color = squareHoverColor;
-            moveSquareRend.material.color = moveHoverColor;
-
-            // moveSquareRend.material.color = moveHoverColor;
-
-        }
-
-
-        if (isHover == false && boardArrayLoaded == true && squareRendLoaded == true)
-        {
-
-            pieceSquareRend.material.color = squareStartColor;
-            moveSquareRend.material.color = moveStartColor;
-
-            //  moveSquareRend.material.color = moveStartColor;
-
-        }
-
-        if (boardArrayLoaded == false)
-        {
-
-            findAllSquares();
-            boardArrayLoaded = true;
-            Debug.Log(chessSquares.Length + " squares loaded");
-        }
-
-
-    }
-
     void findAllSquares()
     {
         if (loadtimer > 0f)
@@ -163,7 +155,7 @@ public class PieceMover : MonoBehaviour
 
         chessSquares = GameObject.FindGameObjectsWithTag("square");
 
-        boardArrayLoaded = true;
+        isBoardArrayLoaded = true;
 
     }
 
