@@ -14,7 +14,8 @@ public class PieceMover : MonoBehaviour
 
     Ray ray;
     RaycastHit hit;
-    private string rayHitString;
+    private string rayHitStringParent;
+    private string rayHitStringChild;
     private GameObject rayHitGameObject;
 
 
@@ -27,6 +28,7 @@ public class PieceMover : MonoBehaviour
     private bool isSquareRendLoaded = false;
     private bool isColourUpdated = false;
     private bool isShowingMovement = false;
+    private bool isClickedOnMoveSquare = false;
 
     public GameObject testCameraBody;
     public GameObject piece;
@@ -78,20 +80,29 @@ public class PieceMover : MonoBehaviour
             isBoardArrayLoaded = true;
         }
 
-        if (Input.GetMouseButton(0)) // Clicking piece locks colour of movesquare until another piece is clicked.
+        if (Input.GetMouseButton(0) && isSquareRendLoaded) // Clicking piece locks colour of movesquare until another piece is clicked.
         {
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             Physics.Raycast(ray, out hit);
-            rayHitString = hit.transform.parent.name;
+            rayHitStringParent = hit.transform.parent.name;
 
-            if (isShowingMovement && isSquareRendLoaded)
+            if (isShowingMovement && rayHitStringParent == moveSquare.transform.parent.name)  
+            {
+                piece.transform.position = hit.transform.position;
+                Debug.Log("Clicked on moveSquare");
+            }
+
+
+            if (isShowingMovement)
             {
 
                 resetColors(false);
                 isShowingMovement = false;
+
+
             }
 
-            if (!isShowingMovement && isSquareRendLoaded && rayHitString == piece.transform.name)
+            if (!isShowingMovement && rayHitStringParent == piece.transform.name)
             {
 
                 pieceSquareRend.material.color = squareHoverColor;
@@ -137,7 +148,7 @@ public class PieceMover : MonoBehaviour
     {
         if (this.gameObject.tag == "pawn")
         {
-            allowedMovement = 2;
+            allowedMovement = 1;
             moveSquareName = nearestSquareParent.Split(char.Parse(","));
             moveSquareCoords = Array.ConvertAll(moveSquareName, s => int.Parse(s));
             moveSquareCoords[1] += allowedMovement;            
