@@ -29,6 +29,7 @@ public class PieceMover : MonoBehaviour
     private bool isColourUpdated = false;
     private bool isShowingMovement = false;
     private bool isClickedOnMoveSquare = false;
+    private bool isInitialSquareRendererLoaded = false;
 
     public GameObject testCameraBody;
     public GameObject piece;
@@ -47,7 +48,7 @@ public class PieceMover : MonoBehaviour
 
     private Vector3[] chessSquaresDistance;
 
-    private float targetDistance = 1f;
+    private float targetDistance = 0.5f;
     private float loadtimer = 1f;
 
     void Start()
@@ -60,9 +61,15 @@ public class PieceMover : MonoBehaviour
 
     void Update()
     {
+        if (isInitialSquareRendererLoaded == false)
+        {
+            getSquareRenderers();
+            
+
+        }
 
 
-        getSquareRenderers(); // add a if to load only once per turn.
+         // add a if to load only once per turn.
 
 
         if (!isHover && isBoardArrayLoaded && isSquareRendLoaded && isColourUpdated) // Reset colour of piece and pieceSquare.
@@ -82,14 +89,18 @@ public class PieceMover : MonoBehaviour
 
         if (Input.GetMouseButton(0) && isSquareRendLoaded) // Clicking piece locks colour of movesquare until another piece is clicked.
         {
+           
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             Physics.Raycast(ray, out hit);
             rayHitStringParent = hit.transform.parent.name;
+            getSquareRenderers();
 
             if (isShowingMovement && rayHitStringParent == moveSquare.transform.parent.name)  
             {
+                
                 piece.transform.position = hit.transform.position;
-                Debug.Log("Clicked on moveSquare");
+                //isInitialSquareRendererLoaded = true;
+
             }
 
 
@@ -108,6 +119,7 @@ public class PieceMover : MonoBehaviour
                 pieceSquareRend.material.color = squareHoverColor;
                 moveSquareRend.material.color = moveHoverColor;
                 isShowingMovement = true;
+                isInitialSquareRendererLoaded = true;
             }
         }
     }
@@ -123,12 +135,14 @@ public class PieceMover : MonoBehaviour
 
     void getSquareRenderers() // Populates each pieces nearest square with the renderer component. Useful for landmarking or reference available positions.
     {
-
         foreach (GameObject _targetSquare in chessSquares)
         {
+            float dist = Vector3.Distance(this.gameObject.transform.position, _targetSquare.transform.position);
+            float debugsum = (targetDistance - dist);
 
-            float dist = Vector3.Distance(piece.gameObject.transform.position, _targetSquare.transform.position);
-            if (dist < targetDistance)
+
+
+            if (dist < Mathf.Abs(1)) // when targetDistance == 1 this statement doesnt work. when it is a local (1), it does.... no idea... float incompatible? 
             {
                 nearestSquare = _targetSquare;
                 nearestSquareParent = _targetSquare.gameObject.transform.parent.name;
@@ -137,9 +151,11 @@ public class PieceMover : MonoBehaviour
                 squareStartColor = pieceSquareRend.material.color;
                 moveableSquares();
                 isSquareRendLoaded = true;
-
+                Debug.Log(dist + " " + _targetSquare.gameObject.transform.parent.name);
             }
+
         }
+        
 
     }
 
