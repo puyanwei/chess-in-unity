@@ -1,6 +1,6 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System;
 using UnityEngine;
 
 public class PieceMover : MonoBehaviour
@@ -48,7 +48,7 @@ public class PieceMover : MonoBehaviour
 
     private Vector3[] chessSquaresDistance;
 
-    private float targetDistance = 0.5f;
+    private float targetDistance = 0.3f;
     private float loadtimer = 1f;
 
     void Start()
@@ -61,15 +61,12 @@ public class PieceMover : MonoBehaviour
 
     void Update()
     {
-        if (isInitialSquareRendererLoaded == false)
+        if (!isInitialSquareRendererLoaded)
         {
             getSquareRenderers();
-            
-
         }
 
-
-         // add a if to load only once per turn.
+        // add a if to load only once per turn.
 
 
         if (!isHover && isBoardArrayLoaded && isSquareRendLoaded && isColourUpdated) // Reset colour of piece and pieceSquare.
@@ -89,17 +86,19 @@ public class PieceMover : MonoBehaviour
 
         if (Input.GetMouseButton(0) && isSquareRendLoaded) // Clicking piece locks colour of movesquare until another piece is clicked.
         {
-           
+
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             Physics.Raycast(ray, out hit);
             rayHitStringParent = hit.transform.parent.name;
             getSquareRenderers();
 
-            if (isShowingMovement && rayHitStringParent == moveSquare.transform.parent.name)  
+            if (isShowingMovement && rayHitStringParent == moveSquare.transform.parent.name) // Move piece
             {
-                
+
                 piece.transform.position = hit.transform.position;
-                //isInitialSquareRendererLoaded = true;
+                isInitialSquareRendererLoaded = false;
+                resetColors(false);
+                isColourUpdated = false;
 
             }
 
@@ -113,7 +112,7 @@ public class PieceMover : MonoBehaviour
 
             }
 
-            if (!isShowingMovement && rayHitStringParent == piece.transform.name)
+            if (!isShowingMovement && rayHitStringParent == piece.transform.name) // Shows square where piece can move to
             {
 
                 pieceSquareRend.material.color = squareHoverColor;
@@ -140,22 +139,18 @@ public class PieceMover : MonoBehaviour
             float dist = Vector3.Distance(this.gameObject.transform.position, _targetSquare.transform.position);
             float debugsum = (targetDistance - dist);
 
-
-
-            if (dist < Mathf.Abs(1)) // when targetDistance == 1 this statement doesnt work. when it is a local (1), it does.... no idea... float incompatible? 
+            if (dist < targetDistance)
             {
                 nearestSquare = _targetSquare;
                 nearestSquareParent = _targetSquare.gameObject.transform.parent.name;
-                targetDistance = dist;
                 pieceSquareRend = nearestSquare.GetComponent<Renderer>() as Renderer;
                 squareStartColor = pieceSquareRend.material.color;
                 moveableSquares();
                 isSquareRendLoaded = true;
-                Debug.Log(dist + " " + _targetSquare.gameObject.transform.parent.name);
             }
 
         }
-        
+
 
     }
 
@@ -167,7 +162,7 @@ public class PieceMover : MonoBehaviour
             allowedMovement = 1;
             moveSquareName = nearestSquareParent.Split(char.Parse(","));
             moveSquareCoords = Array.ConvertAll(moveSquareName, s => int.Parse(s));
-            moveSquareCoords[1] += allowedMovement;            
+            moveSquareCoords[1] += allowedMovement;
             moveSquareParent = GameObject.Find(string.Join(",", moveSquareCoords[0], moveSquareCoords[1]));
             moveSquare = moveSquareParent.transform.GetChild(0).gameObject;
             moveSquareRend = moveSquare.GetComponent<Renderer>() as Renderer;
