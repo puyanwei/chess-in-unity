@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PieceMover : MonoBehaviour
@@ -16,7 +14,7 @@ public class PieceMover : MonoBehaviour
 
     Ray ray;
     RaycastHit hit;
-    private string rayHitStringParent;
+    private string mouseClickPosition;
     private string rayHitStringChild;
     private GameObject rayHitGameObject;
 
@@ -27,13 +25,10 @@ public class PieceMover : MonoBehaviour
     private Renderer parentSquareRend;
 
     private bool isHover = false;
-    private bool isBoardArrayLoaded = false;
-    private bool isMovementSquareShowing = false;
     private bool isColourUpdated = false;
-    private bool isShowingMovement = false;
+    private bool isShowingMoveSquare = false;
     private bool isClickedOnMoveSquare = false;
-    private bool isInitialSquareRendererLoaded = false;
-    private bool isCached = false;
+    // private bool isCached = false;
 
     public GameObject testCameraBody;
     public GameObject piece;
@@ -54,79 +49,54 @@ public class PieceMover : MonoBehaviour
     private Vector3[] chessSquaresDistance;
 
     private float targetDistance = 1f;
-    private float loadtimer = 1f;
 
     void Start()
     {
         rend = GetComponent<Renderer>();
         pieceStartColor = rend.material.color;
-
+        chessSquares = GameObject.FindGameObjectsWithTag("square"); // Populates the chessboard array of all square positions 
     }
 
     void Update()
     {
-        if (!isInitialSquareRendererLoaded)
+        //cacheSquareData(); TODO: Will be info on previous square, for now will be default colour
+
+        if (Input.GetMouseButton(0)) // All permutations of mouse clicks go here
         {
-            calculateAndShowNearestSquareParent();
-        }
-
-        // add a if to load only once per turn.
-
-
-        if (!isHover && isBoardArrayLoaded && isMovementSquareShowing && isColourUpdated) // Reset colour of piece and pieceSquare.
-        {
-
-            resetColors(false);
-            isColourUpdated = false;
-
-        }
-
-        if (!isBoardArrayLoaded) // Loads chessBoard.
-        {
-
-            findAllSquares();
-            isBoardArrayLoaded = true;
-        }
-
-        if (Input.GetMouseButton(0) && isMovementSquareShowing) // Clicking piece locks colour of movesquare until another piece is clicked.
-        {
-            //cacheSquareData();
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             Physics.Raycast(ray, out hit);
-            rayHitStringParent = hit.transform.parent.name;
-            calculateAndShowNearestSquareParent();
-            isCached = true;
+            mouseClickPosition = hit.transform.parent.name;
 
+            updateNearestSquareCoords();
+            updateMovementSquare();
 
+            var isChessPieceClicked = mouseClickPosition == piece.transform.name;
+            var isMoveSquareClicked = mouseClickPosition == moveSquare.transform.parent.name;
 
-            if (isShowingMovement && rayHitStringParent == moveSquare.transform.parent.name) // Move piece
+            // isCached = true;
+
+            if (!isShowingMoveSquare && isChessPieceClicked) // Shows square where the piece can move to when piece is clicked
             {
-
-                piece.transform.position = hit.transform.position;
-                isInitialSquareRendererLoaded = false;
-                resetColors(false);
-                isColourUpdated = false;
-
-            }
-
-
-            if (isShowingMovement)
-            {
-
-                resetColors(false);
-                isShowingMovement = false;
-
-
-            }
-
-            if (!isShowingMovement && rayHitStringParent == piece.transform.name) // Shows square where piece can move to
-            {
-
                 pieceSquare.material.color = squareHoverColor;
                 moveSquareRend.material.color = moveHoverColor;
-                isShowingMovement = true;
-                isInitialSquareRendererLoaded = true;
+                isShowingMoveSquare = true;
             }
+
+            if (isShowingMoveSquare && isMoveSquareClicked && !isHover) // Move piece to the move square on 2nd click
+            {
+                piece.transform.position = hit.transform.position;
+                pieceSquare.material.color = squareStartColor;
+                moveSquareRend.material.color = moveStartColor;
+                isShowingMoveSquare = false;
+            }
+
+            // if (isShowingMoveSquare) // TODO: Clicking outside of piece or move square
+            // {
+            //     pieceSquare.material.color = squareStartColor;
+            //     moveSquareRend.material.color = moveStartColor;
+            //     isShowingMoveSquare = false;
+            // }
+
         }
     }
 
@@ -158,26 +128,12 @@ public class PieceMover : MonoBehaviour
     //        cacheColor = parentSquareRend.material.color;
     //        Debug.Log(cacheColor);
 
-
     //        isCached = true;
-
-
     //    }
-
     //}
 
 
-
-    void resetColors(bool updateColor)
-    {
-        pieceSquare.material.color = squareStartColor;
-        moveSquareRend.material.color = moveStartColor;
-        isColourUpdated = updateColor;
-    }
-
-
-
-    void calculateAndShowNearestSquareParent() // Populates each pieces nearest square with the renderer component. Useful for landmarking or reference available positions.
+    void updateNearestSquareCoords() // Populates each pieces nearest square with the renderer component. Useful for landmarking or reference available positions.
     {
         foreach (GameObject _targetSquare in chessSquares)
         {
@@ -190,16 +146,12 @@ public class PieceMover : MonoBehaviour
 
                 pieceSquare = nearestSquare.GetComponent<Renderer>() as Renderer;
                 squareStartColor = pieceSquare.material.color;
-                showMovementSquare();
             }
-
         }
-
-
     }
 
 
-    void showMovementSquare()
+    void updateMovementSquare()
     {
         if (this.gameObject.tag == "pawn")
         {
@@ -232,32 +184,11 @@ public class PieceMover : MonoBehaviour
 
 
         }
-        isMovementSquareShowing = true;
-
     }
-
-    void findAllSquares()
-    {
-        if (loadtimer > 0f)
-        {
-
-            loadtimer -= Time.deltaTime;
-            findAllSquares();
-        }
-
-        chessSquares = GameObject.FindGameObjectsWithTag("square");
-
-        isBoardArrayLoaded = true;
-
-    }
-
-
     void OnMouseOver()
     {
         rend.material.color = pieceHoverColor;
         isHover = true;
-
-
     }
 
 
@@ -265,7 +196,6 @@ public class PieceMover : MonoBehaviour
     {
         rend.material.color = pieceStartColor;
         isHover = false;
-
     }
 }
 
