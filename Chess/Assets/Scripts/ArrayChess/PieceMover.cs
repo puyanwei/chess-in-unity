@@ -10,6 +10,7 @@ public class PieceMover : MonoBehaviour
     public Color moveHoverColor;
     public Color moveStartColor;
     public Color cacheColor;
+    public Color firstSquareStartColor;
 
 
     Ray ray;
@@ -19,20 +20,19 @@ public class PieceMover : MonoBehaviour
     private GameObject rayHitGameObject;
 
 
-    private Renderer chessPieceRend;
+    private Renderer pieceRend;
     private Renderer pieceSquareRend;
     private Renderer moveSquareRend;
     private Renderer parentSquareRend;
+    private Renderer firstPieceSquareRend;
 
-    private bool isHover = false;
     private bool isColourUpdated = false;
     private bool isShowingMoveSquare = false;
     private bool isClickedOnMoveSquare = false;
 
     private bool isChessPieceClicked = false;
     private bool isMoveSquareClicked = false;
-
-    // private bool isCached = false;
+    private bool isFirstSquareRendererLoaded = false;
 
     public GameObject testCameraBody;
     public GameObject piece;
@@ -43,9 +43,15 @@ public class PieceMover : MonoBehaviour
     public GameObject moveSquareParent;
     public GameObject moveSquare;
     public GameObject cachedSquareObject;
+    public GameObject firstNearestSquare;
+    
+
+
+
 
     private string[] moveSquareName;
     public string nearestSquareParent;
+    public string firstNearestSquareParent;
 
     public int[] moveSquareCoords;
     public int allowedMovement;
@@ -56,16 +62,19 @@ public class PieceMover : MonoBehaviour
 
     void Start()
     {
-        chessPieceRend = GetComponent<Renderer>();
-        pieceStartColor = chessPieceRend.material.color;
+        pieceRend = GetComponent<Renderer>();
+        pieceStartColor = pieceRend.material.color;
         chessSquares = GameObject.FindGameObjectsWithTag("square"); // Populates the chessboard array of all square positions 
     }
 
     void Update()
     {
+
+        if (!isFirstSquareRendererLoaded) firstUpdateNearestSquareCoords();  // firstSquareRenderer bool and function to be replaced by a duplicate chessSquares and/or array for start colours of all squares.
+
         //cacheSquareData(); TODO: Will be info on previous square, for now will be default colour
 
-        if (Input.GetMouseButton(0)) // All permutations of mouse clicks go here
+        if (Input.GetMouseButtonDown(0))// All permutations of mouse clicks go here
         {
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             Physics.Raycast(ray, out hit);
@@ -77,10 +86,15 @@ public class PieceMover : MonoBehaviour
             isChessPieceClicked = mouseClickPosition == piece.transform.name;
             isMoveSquareClicked = mouseClickPosition == moveSquare.transform.parent.name;
 
-            // isCached = true;
+            if (isChessPieceClicked) pieceRend.material.color = pieceClickedColor;
+            if (!isChessPieceClicked) pieceRend.material.color = pieceStartColor;
 
-            if (isChessPieceClicked) chessPieceRend.material.color = pieceClickedColor;
-            if (!isChessPieceClicked) chessPieceRend.material.color = pieceStartColor;
+            if (!isChessPieceClicked && isShowingMoveSquare && !isMoveSquareClicked)
+            {
+                pieceRend.material.color = pieceStartColor;
+                pieceSquareRend.material.color = firstSquareStartColor;
+                moveSquareRend.material.color = moveStartColor;
+            }
 
             if (!isShowingMoveSquare && isChessPieceClicked) // Shows square where the piece can move to when piece is clicked
             {
@@ -89,7 +103,7 @@ public class PieceMover : MonoBehaviour
                 isShowingMoveSquare = true;
             }
 
-            if (isShowingMoveSquare && isMoveSquareClicked && !isHover) // Move piece to the move square on 2nd click
+            if (isShowingMoveSquare && isMoveSquareClicked) // Move piece to the move square on 2nd click
             {
                 piece.transform.position = hit.transform.position;
                 pieceSquareRend.material.color = squareStartColor;
@@ -97,47 +111,26 @@ public class PieceMover : MonoBehaviour
                 isShowingMoveSquare = false;
             }
 
-            // if (isShowingMoveSquare) // TODO: Clicking outside of piece or move square
-            // {
-            //     pieceSquareRend.material.color = squareStartColor;
-            //     moveSquareRend.material.color = moveStartColor;
-            //     isShowingMoveSquare = false;
-            // }
-
         }
     }
 
+    void firstUpdateNearestSquareCoords() // Populates each pieces nearest square with the renderer component. Useful for landmarking or reference available positions.
+    {
+        foreach (GameObject _targetSquare in chessSquares)
+        {
+            float dist = Vector3.Distance(this.gameObject.transform.position, _targetSquare.transform.position);
 
-    // to do - write script to cache colour in array spawner per square. use getcomponent pull the cache color from square.
+            if (dist < targetDistance)
+            {
+                firstNearestSquare = _targetSquare;
+                firstNearestSquareParent = _targetSquare.gameObject.transform.parent.name;
 
-    //void cacheSquareData()
-    //{
-    //    cachedSquareObject = GameObject.Find(nearestSquareParent);
-    //    parentSquareRend = cachedSquareObject.GetComponentInChildren<Renderer>();
-
-    //    Color blk = new Color(0, 0, 0, 1);
-    //    Color wht = new Color(255, 255, 255, 255);
-
-
-    //    if (isCached && cacheColor != blk || cacheColor != wht) // n piece selection or cache
-    //    {
-    //        cacheColor = parentSquareRend.material.color;
-    //        Debug.Log("second selection " + cacheColor);
-    //        Debug.Log(blk);
-    //        Debug.Log(wht);
-    //        Debug.Log("MouseDown " + Time.frameCount + " : ");
-
-
-    //    }
-
-    //    if (!isCached) // first selection or cache
-    //    {
-    //        cacheColor = parentSquareRend.material.color;
-    //        Debug.Log(cacheColor);
-
-    //        isCached = true;
-    //    }
-    //}
+                firstPieceSquareRend = firstNearestSquare.GetComponent<Renderer>() as Renderer;
+                firstSquareStartColor = firstPieceSquareRend.material.color;
+            }
+        }
+        isFirstSquareRendererLoaded = true;
+    }
 
 
     void updateNearestSquareCoords() // Populates each pieces nearest square with the renderer component. Useful for landmarking or reference available positions.
