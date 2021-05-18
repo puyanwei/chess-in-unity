@@ -160,8 +160,10 @@ MonoBehaviour:
   squareStartColor: {r: 0, g: 0, b: 0, a: 0}
   pieceHoverColor: {r: 0.7978417, g: 0.8301887, b: 0.090067655, a: 0}
   pieceStartColor: {r: 0, g: 0, b: 0, a: 0}
+  pieceClickedColor: {r: 1, g: 0.07943219, b: 0.07943219, a: 0}
   moveHoverColor: {r: 0.078431375, g: 0.85882354, b: 0.8509804, a: 0}
   moveStartColor: {r: 0, g: 0, b: 0, a: 0}
+  cacheColor: {r: 0, g: 0, b: 0, a: 0}
   testCameraBody: {fileID: 6227287639319328705, guid: 13f5245ebe6d0ee43ab1d50a4194ec8c, type: 3}
   piece: {fileID: 296864922360553300}
   chessSquare: {fileID: 7994451427936772267, guid: fd22b88497a2c204e80805a64c6c8408, type: 3}
@@ -170,6 +172,7 @@ MonoBehaviour:
   pieces: []
   moveSquareParent: {fileID: 0}
   moveSquare: {fileID: 0}
+  cachedSquareObject: {fileID: 0}
   nearestSquareParent: 
   moveSquareCoords: 
   allowedMovement: 0

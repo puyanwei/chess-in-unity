@@ -5,8 +5,8 @@ public class PieceMover : MonoBehaviour
 {
     public Color squareHoverColor;
     public Color squareStartColor;
-    public Color pieceHoverColor;
     public Color pieceStartColor;
+    public Color pieceClickedColor;
     public Color moveHoverColor;
     public Color moveStartColor;
     public Color cacheColor;
@@ -19,8 +19,8 @@ public class PieceMover : MonoBehaviour
     private GameObject rayHitGameObject;
 
 
-    private Renderer rend;
-    private Renderer pieceSquare;
+    private Renderer chessPieceRend;
+    private Renderer pieceSquareRend;
     private Renderer moveSquareRend;
     private Renderer parentSquareRend;
 
@@ -28,6 +28,10 @@ public class PieceMover : MonoBehaviour
     private bool isColourUpdated = false;
     private bool isShowingMoveSquare = false;
     private bool isClickedOnMoveSquare = false;
+
+    private bool isChessPieceClicked = false;
+    private bool isMoveSquareClicked = false;
+
     // private bool isCached = false;
 
     public GameObject testCameraBody;
@@ -52,8 +56,8 @@ public class PieceMover : MonoBehaviour
 
     void Start()
     {
-        rend = GetComponent<Renderer>();
-        pieceStartColor = rend.material.color;
+        chessPieceRend = GetComponent<Renderer>();
+        pieceStartColor = chessPieceRend.material.color;
         chessSquares = GameObject.FindGameObjectsWithTag("square"); // Populates the chessboard array of all square positions 
     }
 
@@ -70,14 +74,17 @@ public class PieceMover : MonoBehaviour
             updateNearestSquareCoords();
             updateMovementSquare();
 
-            var isChessPieceClicked = mouseClickPosition == piece.transform.name;
-            var isMoveSquareClicked = mouseClickPosition == moveSquare.transform.parent.name;
+            isChessPieceClicked = mouseClickPosition == piece.transform.name;
+            isMoveSquareClicked = mouseClickPosition == moveSquare.transform.parent.name;
 
             // isCached = true;
 
+            if (isChessPieceClicked) chessPieceRend.material.color = pieceClickedColor;
+            if (!isChessPieceClicked) chessPieceRend.material.color = pieceStartColor;
+
             if (!isShowingMoveSquare && isChessPieceClicked) // Shows square where the piece can move to when piece is clicked
             {
-                pieceSquare.material.color = squareHoverColor;
+                pieceSquareRend.material.color = squareHoverColor;
                 moveSquareRend.material.color = moveHoverColor;
                 isShowingMoveSquare = true;
             }
@@ -85,14 +92,14 @@ public class PieceMover : MonoBehaviour
             if (isShowingMoveSquare && isMoveSquareClicked && !isHover) // Move piece to the move square on 2nd click
             {
                 piece.transform.position = hit.transform.position;
-                pieceSquare.material.color = squareStartColor;
+                pieceSquareRend.material.color = squareStartColor;
                 moveSquareRend.material.color = moveStartColor;
                 isShowingMoveSquare = false;
             }
 
             // if (isShowingMoveSquare) // TODO: Clicking outside of piece or move square
             // {
-            //     pieceSquare.material.color = squareStartColor;
+            //     pieceSquareRend.material.color = squareStartColor;
             //     moveSquareRend.material.color = moveStartColor;
             //     isShowingMoveSquare = false;
             // }
@@ -144,8 +151,8 @@ public class PieceMover : MonoBehaviour
                 nearestSquare = _targetSquare;
                 nearestSquareParent = _targetSquare.gameObject.transform.parent.name;
 
-                pieceSquare = nearestSquare.GetComponent<Renderer>() as Renderer;
-                squareStartColor = pieceSquare.material.color;
+                pieceSquareRend = nearestSquare.GetComponent<Renderer>() as Renderer;
+                squareStartColor = pieceSquareRend.material.color;
             }
         }
     }
@@ -184,18 +191,6 @@ public class PieceMover : MonoBehaviour
 
 
         }
-    }
-    void OnMouseOver()
-    {
-        rend.material.color = pieceHoverColor;
-        isHover = true;
-    }
-
-
-    void OnMouseExit()
-    {
-        rend.material.color = pieceStartColor;
-        isHover = false;
     }
 }
 
