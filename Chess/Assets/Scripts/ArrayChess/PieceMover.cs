@@ -29,6 +29,7 @@ public class PieceMover : MonoBehaviour
     private bool isColourUpdated = false;
     private bool isShowingMoveSquare = false;
     private bool isClickedOnMoveSquare = false;
+    private bool isMoveSquareRendered = false;
 
     private bool isChessPieceClicked = false;
     private bool isMoveSquareClicked = false;
@@ -82,6 +83,7 @@ public class PieceMover : MonoBehaviour
 
             updateNearestSquareCoords();
             updateMovementSquare();
+            Debug.Log(isMoveSquareRendered);
 
             isChessPieceClicked = mouseClickPosition == piece.transform.name;
             isMoveSquareClicked = mouseClickPosition == moveSquare.transform.parent.name;
@@ -94,6 +96,7 @@ public class PieceMover : MonoBehaviour
                 pieceRend.material.color = pieceStartColor;
                 pieceSquareRend.material.color = firstSquareStartColor;
                 moveSquareRend.material.color = moveStartColor;
+                isMoveSquareRendered = false;
             }
 
             if (!isShowingMoveSquare && isChessPieceClicked) // Shows square where the piece can move to when piece is clicked
@@ -106,13 +109,22 @@ public class PieceMover : MonoBehaviour
             if (isShowingMoveSquare && isMoveSquareClicked) // Move piece to the move square on 2nd click
             {
                 piece.transform.position = hit.transform.position;
-                pieceSquareRend.material.color = squareStartColor;
+                pieceSquareRend.material.color = firstSquareStartColor;
                 moveSquareRend.material.color = moveStartColor;
+                isFirstSquareRendererLoaded = false;
                 isShowingMoveSquare = false;
+                isMoveSquareRendered = false;
+                
             }
 
         }
     }
+
+    void turnUpdateParentSquare()
+    {
+        
+    }
+
 
     void firstUpdateNearestSquareCoords() // Populates each pieces nearest square with the renderer component. Useful for landmarking or reference available positions.
     {
@@ -153,38 +165,44 @@ public class PieceMover : MonoBehaviour
 
     void updateMovementSquare()
     {
-        if (this.gameObject.tag == "pawn")
+    
+        if (isMoveSquareRendered == false)
         {
-            allowedMovement = 1; // Temp movement of pawn, for now we'll just do moving forward 1 square
+            if (this.gameObject.tag == "pawn")
+            {
+                allowedMovement = 1; // Temp movement of pawn, for now we'll just do moving forward 1 square
 
-            // Conversion of array formatted coordinates string to allow for adding in allowed movement so that piece can move there
-            moveSquareName = nearestSquareParent.Split(char.Parse(","));
-            moveSquareCoords = Array.ConvertAll(moveSquareName, s => int.Parse(s));
-            moveSquareCoords[1] += allowedMovement;
-            moveSquareParent = GameObject.Find(string.Join(",", moveSquareCoords[0], moveSquareCoords[1]));
+                // Conversion of array formatted coordinates string to allow for adding in allowed movement so that piece can move there
+                moveSquareName = nearestSquareParent.Split(char.Parse(","));
+                moveSquareCoords = Array.ConvertAll(moveSquareName, s => int.Parse(s));
+                moveSquareCoords[1] += allowedMovement;
+                moveSquareParent = GameObject.Find(string.Join(",", moveSquareCoords[0], moveSquareCoords[1]));
 
-            moveSquare = moveSquareParent.transform.GetChild(0).gameObject; // Square that piece can move to
-            moveSquareRend = moveSquare.GetComponent<Renderer>() as Renderer; // Render movement square
-            moveStartColor = moveSquareRend.material.color; // Change colour of movement square
-
-
-        }
-        if (this.gameObject.tag == "rook")
-        {
+                moveSquare = moveSquareParent.transform.GetChild(0).gameObject; // Square that piece can move to
+                moveSquareRend = moveSquare.GetComponent<Renderer>() as Renderer; // Render movement square
+                moveStartColor = moveSquareRend.material.color; // Change colour of movement square
 
 
-        }
-        if (this.gameObject.tag == "knight")
-        {
+            }
+            if (this.gameObject.tag == "rook")
+            {
 
 
-        }
-        if (this.gameObject.tag == "queen")
-        {
+            }
+            if (this.gameObject.tag == "knight")
+            {
 
 
+            }
+            if (this.gameObject.tag == "queen")
+            {
+
+
+            }
+            isMoveSquareRendered = true;
         }
     }
+
 }
 
 
